@@ -3,7 +3,7 @@ name: Deploy Astro site
 on:
   push:
     branches:
-      - astro-portfolio
+      - new-portfolio
 
 permissions:
   contents: read
