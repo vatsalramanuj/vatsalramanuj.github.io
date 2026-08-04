@@ -1,0 +1,265 @@
+---
+const projects = [
+  {
+    title: "IITM Timetable Maker",
+    year: "2024",
+    description:
+      "Developed a web application that automatically converts IIT Madras timetable data into Google Calendar events, simplifying semester planning for students.",
+    highlights: [
+      "Automatic timetable parsing",
+      "Google Calendar (.ics) generation",
+      "Responsive web interface",
+      "Semester schedule management"
+    ],
+    technologies: [
+      "Python",
+      "Flask",
+      "HTML",
+      "CSS",
+      "JavaScript"
+    ],
+    github: "#",
+    demo: "#"
+  },
+
+  {
+    title: "Digit Recognizer",
+    year: "2023",
+    description:
+      "Built a handwritten digit recognition system from scratch using NumPy without relying on deep learning frameworks, accompanied by an interactive graphical interface.",
+    highlights: [
+      "Neural network from scratch",
+      "Backpropagation implementation",
+      "NumPy only",
+      "Interactive GUI"
+    ],
+    technologies: [
+      "Python",
+      "NumPy",
+      "Machine Learning",
+      "Tkinter"
+    ],
+    github: "#",
+    demo: "#"
+  },
+
+  {
+    title: "Obstacle Dodger",
+    year: "2023",
+    description:
+      "Created a computer vision game controlled entirely through head movement using a webcam, exploring real-time human-computer interaction.",
+    highlights: [
+      "Real-time face tracking",
+      "OpenCV-based control",
+      "Gesture interaction",
+      "Game development"
+    ],
+    technologies: [
+      "Python",
+      "OpenCV",
+      "Computer Vision"
+    ],
+    github: "#",
+    demo: "#"
+  }
+];
+---
+
+<section
+  id="projects"
+  class="py-32 bg-zinc-900">
+
+  <div class="container mx-auto max-w-7xl px-6">
+
+    <div class="mb-20">
+
+      <p class="uppercase tracking-[0.35em] text-sky-400 text-sm mb-4">
+        Projects
+      </p>
+
+      <h2 class="text-5xl md:text-6xl font-bold font-['Space_Grotesk']">
+        Featured Projects
+      </h2>
+
+      <p class="text-zinc-400 max-w-3xl mt-8 text-lg leading-8">
+
+        Outside research, I enjoy building software tools,
+        experimenting with computer vision,
+        and exploring machine learning through independent projects.
+
+      </p>
+
+    </div>
+
+    <div class="space-y-10">
+
+      {
+        projects.map((project) => (
+
+          <article
+            class="group rounded-3xl
+                   border border-white/10
+                   bg-white/5
+                   backdrop-blur-md
+                   p-8 md:p-10
+                   transition-all duration-300
+                   hover:border-sky-500/40
+                   hover:bg-white/10
+                   hover:-translate-y-1">
+
+            <div class="flex flex-col lg:flex-row gap-10">
+
+              <div class="lg:w-2/3">
+
+                <div class="flex items-center gap-4">
+
+                  <h3
+                    class="text-3xl font-bold
+                           group-hover:text-sky-400
+                           transition">
+
+                    {project.title}
+
+                  </h3>
+
+                  <span
+                    class="rounded-full
+                           bg-sky-500/10
+                           border border-sky-500/20
+                           px-3 py-1
+                           text-xs
+                           text-sky-300">
+
+                    {project.year}
+
+                  </span>
+
+                </div>
+
+                <p
+                  class="mt-8 text-zinc-300 leading-8">
+
+                  {project.description}
+
+                </p>
+
+                <div class="mt-8">
+
+                  <h4
+                    class="text-white font-semibold mb-4">
+
+                    Highlights
+
+                  </h4>
+
+                  <ul
+                    class="grid md:grid-cols-2 gap-3">
+
+                    {
+                      project.highlights.map(item => (
+
+                        <li
+                          class="flex items-start gap-3 text-zinc-300">
+
+                          <span class="text-sky-400 mt-1">
+
+                            ●
+
+                          </span>
+
+                          <span>{item}</span>
+
+                        </li>
+
+                      ))
+                    }
+
+                  </ul>
+
+                </div>
+
+                <div class="flex gap-4 mt-10">
+
+                  <a
+                    href={project.github}
+                    class="rounded-xl
+                           bg-sky-500
+                           px-6 py-3
+                           font-medium
+                           transition
+                           hover:bg-sky-400">
+
+                    GitHub
+
+                  </a>
+
+                  <a
+                    href={project.demo}
+                    class="rounded-xl
+                           border border-zinc-700
+                           px-6 py-3
+                           transition
+                           hover:border-zinc-500">
+
+                    Live Demo
+
+                  </a>
+
+                </div>
+
+              </div>
+
+              <div class="lg:w-1/3">
+
+                <div
+                  class="rounded-2xl
+                         bg-zinc-900/60
+                         border border-white/10
+                         p-6">
+
+                  <h4
+                    class="font-semibold mb-5">
+
+                    Technologies
+
+                  </h4>
+
+                  <div
+                    class="flex flex-wrap gap-3">
+
+                    {
+                      project.technologies.map(skill => (
+
+                        <span
+                          class="rounded-full
+                                 bg-sky-500/10
+                                 border border-sky-500/20
+                                 px-4 py-2
+                                 text-sm
+                                 text-sky-300">
+
+                          {skill}
+
+                        </span>
+
+                      ))
+                    }
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        ))
+      }
+
+    </div>
+
+  </div>
+
+</section>

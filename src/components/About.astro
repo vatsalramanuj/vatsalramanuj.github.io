@@ -1,0 +1,193 @@
+<section class="section container">
+
+  <h2 class="mb-8 text-4xl font-bold">
+    About
+  </h2>
+
+
+  <div class="grid gap-8 md:grid-cols-3">
+
+
+    <!-- Left Profile Card -->
+    <div
+      class="about-card-left rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 backdrop-blur-sm">
+
+      <p class="mb-6 text-sm uppercase tracking-[0.3em] text-sky-400">
+        Engineering Profile
+      </p>
+
+      <div class="space-y-5">
+
+        <div>
+          <p class="text-sm text-zinc-500">Current</p>
+          <p class="text-zinc-200">
+            MSc Communications & Signal Processing
+          </p>
+          <p class="text-zinc-400">
+            Imperial College London
+          </p>
+        </div>
+
+
+        <div>
+          <p class="text-sm text-zinc-500">Core Areas</p>
+          <p class="text-zinc-200">
+            RF Systems · DSP · AI
+          </p>
+        </div>
+
+
+        <div>
+          <p class="text-sm text-zinc-500">Building</p>
+          <p class="text-zinc-200">
+            Intelligent Sensing Systems
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- Text -->
+    <div class="about-text md:col-span-2 space-y-6">
+
+      <p class="leading-8 text-zinc-400">
+        I'm an Electrical Engineer and incoming MSc student in
+        Communications and Signal Processing at Imperial College London,
+        with experience developing intelligent sensing systems across
+        machine learning, signal processing, RF engineering, and
+        computational imaging.
+      </p>
+
+
+      <p class="leading-8 text-zinc-400">
+        My work has ranged from physics-informed passive radar
+        localisation and radio astronomy to optical microscopy and
+        autonomous vehicle perception systems. I enjoy solving complex
+        engineering problems by combining mathematical modelling with
+        practical software and hardware development.
+      </p>
+
+
+
+      <div class="grid gap-4 sm:grid-cols-3">
+
+
+        <div class="about-card-right rounded-xl border border-zinc-800 bg-zinc-950/40 p-5">
+          <h3 class="mb-3 text-lg font-semibold text-white">
+            RF Systems
+          </h3>
+
+          <p class="text-sm text-zinc-400">
+            Antennas, electromagnetic modelling,
+            radar systems, and communication links.
+          </p>
+        </div>
+
+
+        <div class="about-card-right rounded-xl border border-zinc-800 bg-zinc-950/40 p-5">
+          <h3 class="mb-3 text-lg font-semibold text-white">
+            Signal Processing
+          </h3>
+
+          <p class="text-sm text-zinc-400">
+            Detection, localisation,
+            inference, and modelling.
+          </p>
+        </div>
+
+
+        <div class="about-card-right rounded-xl border border-zinc-800 bg-zinc-950/40 p-5">
+          <h3 class="mb-3 text-lg font-semibold text-white">
+            AI Systems
+          </h3>
+
+          <p class="text-sm text-zinc-400">
+            Machine learning,
+            vision, and perception.
+          </p>
+        </div>
+
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<script>
+const observer = new IntersectionObserver(
+  (entries) => {
+
+    entries.forEach(entry => {
+
+      if (entry.isIntersecting) {
+
+        document
+          .querySelectorAll(".about-card-left")
+          .forEach(el =>
+            el.classList.add("show")
+          );
+
+
+        document
+          .querySelectorAll(".about-card-right")
+          .forEach((el, i) => {
+
+            setTimeout(() => {
+              el.classList.add("show");
+            }, i * 150);
+
+          });
+
+      }
+
+    });
+
+  },
+  {
+    threshold: 0.3
+  }
+);
+
+
+const about = document.querySelector(".about-card-left");
+
+if (about) {
+  observer.observe(about);
+}
+
+</script>
+
+<style>
+
+.about-card-left {
+  opacity:0;
+  transform:translateX(-80px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+
+
+.about-card-right {
+  opacity:0;
+  transform:translateX(80px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+
+
+.show {
+
+  opacity:1;
+  transform:translateX(0);
+
+}
+
+</style>

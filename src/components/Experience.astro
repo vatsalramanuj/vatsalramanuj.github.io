@@ -1,0 +1,237 @@
+---
+const experiences = [
+  {
+    company: "OLA Krutrim",
+    role: "ADAS Software Development Intern",
+    period: "May 2025 – Aug 2025",
+    location: "Bengaluru, India",
+    description:
+      "Developed and validated software for Advanced Driver Assistance Systems (ADAS) for electric two-wheelers, focusing on safety-critical perception and deployment workflows.",
+    achievements: [
+      "Implemented and tested Forward Collision Warning, Blind Spot Detection and Lane Departure Warning systems.",
+      "Developed automated software tests to improve reliability and code coverage.",
+      "Containerised development workflows using Docker.",
+      "Performed hardware-in-the-loop and on-road validation of ADAS features.",
+      "Collaborated with embedded, perception and validation teams."
+    ],
+    technologies: [
+      "C++",
+      "Python",
+      "Docker",
+      "Linux",
+      "Git"
+    ]
+  },
+
+  {
+    company: "Centre of Light for Life, University of Adelaide",
+    role: "Research Intern",
+    period: "May 2024 – Jul 2024",
+    location: "Adelaide, Australia",
+    description:
+      "Worked on optical imaging systems for biological microscopy, combining experimental optics with computational image reconstruction.",
+    achievements: [
+      "Aligned and characterised Bessel and Airy beam optical systems.",
+      "Performed PSF analysis and image deconvolution.",
+      "Worked with diffraction-free light-sheet microscopy.",
+      "Processed volumetric biological image datasets."
+    ],
+    technologies: [
+      "Python",
+      "Optics",
+      "Photonics",
+      "Image Processing"
+    ]
+  },
+
+  {
+    company: "Silver Touch Technologies",
+    role: "Machine Learning Intern",
+    period: "May 2023 – Jul 2023",
+    location: "Ahmedabad, India",
+    description:
+      "Developed machine learning models for dengue outbreak forecasting using multivariate time-series datasets.",
+    achievements: [
+      "Built LSTM and GRU forecasting models.",
+      "Evaluated LightGBM-based approaches.",
+      "Compared forecasting accuracy across multiple architectures.",
+      "Analysed epidemiological datasets."
+    ],
+    technologies: [
+      "Python",
+      "TensorFlow",
+      "LightGBM",
+      "Pandas",
+      "Machine Learning"
+    ]
+  }
+];
+---
+
+<section id="experience" class="py-32 bg-zinc-950">
+
+  <div class="container mx-auto max-w-7xl px-6">
+
+    <div class="mb-20">
+
+      <p class="uppercase tracking-[0.35em] text-sky-400 text-sm mb-4">
+        Experience
+      </p>
+
+      <h2 class="text-5xl md:text-6xl font-bold font-['Space_Grotesk']">
+        Professional Experience
+      </h2>
+
+      <p class="text-zinc-400 max-w-3xl mt-8 text-lg leading-8">
+        Through internships across industry and research laboratories,
+        I've worked on intelligent sensing, autonomous systems,
+        machine learning and computational imaging.
+      </p>
+
+    </div>
+
+    <div class="relative">
+
+      <div
+        class="absolute left-4 md:left-6 top-0 bottom-0 w-px bg-zinc-800">
+      </div>
+
+      <div class="space-y-16">
+
+        {
+          experiences.map((job) => (
+
+            <div class="relative pl-14">
+
+              <div
+                class="absolute left-0 top-2
+                       h-8 w-8 rounded-full
+                       border-4 border-zinc-950
+                       bg-sky-500">
+              </div>
+
+              <div
+                class="rounded-3xl
+                       border border-white/10
+                       bg-white/5
+                       backdrop-blur-md
+                       p-8
+                       transition
+                       duration-300
+                       hover:border-sky-500/40
+                       hover:bg-white/10">
+
+                <div
+                  class="flex flex-col lg:flex-row
+                         lg:items-center
+                         lg:justify-between">
+
+                  <div>
+
+                    <h3
+                      class="text-3xl font-bold">
+
+                      {job.role}
+
+                    </h3>
+
+                    <p
+                      class="text-sky-400 mt-2">
+
+                      {job.company}
+
+                    </p>
+
+                  </div>
+
+                  <div
+                    class="mt-6 lg:mt-0
+                           text-zinc-400 text-sm">
+
+                    <p>{job.period}</p>
+
+                    <p>{job.location}</p>
+
+                  </div>
+
+                </div>
+
+                <p
+                  class="mt-8 text-zinc-300 leading-8">
+
+                  {job.description}
+
+                </p>
+
+                <div class="mt-8">
+
+                  <h4
+                    class="font-semibold mb-4">
+
+                    Key Contributions
+
+                  </h4>
+
+                  <ul
+                    class="space-y-3">
+
+                    {
+                      job.achievements.map(item => (
+
+                        <li
+                          class="flex gap-3 text-zinc-300">
+
+                          <span class="text-sky-400">
+
+                            ●
+
+                          </span>
+
+                          <span>{item}</span>
+
+                        </li>
+
+                      ))
+                    }
+
+                  </ul>
+
+                </div>
+
+                <div
+                  class="flex flex-wrap gap-3 mt-10">
+
+                  {
+                    job.technologies.map(skill => (
+
+                      <span
+                        class="rounded-full
+                               bg-sky-500/10
+                               border border-sky-500/20
+                               px-4 py-2
+                               text-sm
+                               text-sky-300">
+
+                        {skill}
+
+                      </span>
+
+                    ))
+                  }
+
+                </div>
+
+              </div>
+
+            </div>
+
+          ))
+        }
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>

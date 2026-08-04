@@ -1,17 +1,39 @@
 ---
+import Layout from "../layouts/Layout.astro";
 
+import Navbar from "../components/Navbar.astro";
+import Hero from "../components/Hero.astro";
+
+import About from "../components/About.astro";
+import Research from "../components/Research.astro";
+import Projects from "../components/Projects.astro";
+import Experience from "../components/Experience.astro";
+import Leadership from "../components/Leadership.astro";
+import Skills from "../components/Skills.astro";
+import Achievements from "../components/Achievements.astro";
+import Contact from "../components/Contact.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout>
+
+<Navbar />
+
+<Hero />
+
+<About />
+
+<Research />
+
+<Projects />
+
+<Experience />
+
+<Leadership />
+
+<Skills />
+
+<Achievements />
+
+<Contact />
+
+</Layout>

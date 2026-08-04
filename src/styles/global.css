@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/* ---------- Theme ---------- */
+
+:root {
+  --bg: #09090b;
+  --surface: #18181b;
+  --surface-light: #27272a;
+
+  --primary: #3b82f6;
+  --secondary: #38bdf8;
+
+  --text: #fafafa;
+  --muted: #a1a1aa;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", sans-serif;
+}
+
+/* ---------- Selection ---------- */
+
+::selection {
+  background: var(--primary);
+  color: white;
+}
+
+/* ---------- Scrollbar ---------- */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 20px;
+}
+
+/* ---------- Utility ---------- */
+
+.container {
+  @apply max-w-7xl mx-auto px-6 lg:px-10;
+}
+
+.section {
+  @apply py-28;
+}
+

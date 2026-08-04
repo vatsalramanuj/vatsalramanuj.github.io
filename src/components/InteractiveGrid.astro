@@ -1,0 +1,209 @@
+<div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+    <canvas class="vector-field"></canvas>
+</div>
+
+<script>
+(() => {
+
+    const canvas = document.querySelector(".vector-field");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    let width, height;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    // Adaptive spacing
+    const BASE_SPACING = 42;
+
+    const BASE_LENGTH = 10;
+    const MAX_LENGTH = 22;
+    const INFLUENCE_RADIUS = 420;
+    const SMOOTHING = 0.22;
+
+    const vectors = [];
+
+    const mouse = {
+        x: 0,
+        y: 0
+    };
+
+
+    function resize() {
+
+        const rect = canvas.parentElement.getBoundingClientRect();
+
+        width = rect.width;
+        height = rect.height;
+
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+
+
+        mouse.x = width / 2;
+        mouse.y = height / 2;
+
+
+        vectors.length = 0;
+
+
+        // Reduce density on large screens
+        const spacing = Math.max(
+            BASE_SPACING,
+            Math.sqrt(width * height) / 30
+        );
+
+
+        for (let x = spacing / 2; x < width; x += spacing) {
+
+            for (let y = spacing / 2; y < height; y += spacing) {
+
+                const dx = mouse.x - x;
+                const dy = mouse.y - y;
+
+                vectors.push({
+
+                    x,
+                    y,
+
+                    angle: Math.atan2(dy,dx)
+
+                });
+
+            }
+        }
+
+    }
+
+
+    window.addEventListener("resize", resize);
+
+
+    window.addEventListener("pointermove", e => {
+
+        const rect = canvas.getBoundingClientRect();
+
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+
+    });
+
+
+    resize();
+
+
+
+    function animate(){
+
+
+        ctx.clearRect(0,0,width,height);
+
+
+        // Removed shadowBlur - huge performance gain
+
+
+        for (let i=0;i<vectors.length;i++){
+
+            const v = vectors[i];
+
+
+            const dx = mouse.x - v.x;
+            const dy = mouse.y - v.y;
+
+
+            const dist = Math.hypot(dx,dy);
+
+
+            const target = Math.atan2(dy,dx);
+
+
+            let delta = target - v.angle;
+
+            delta = Math.atan2(
+                Math.sin(delta),
+                Math.cos(delta)
+            );
+
+
+            v.angle += delta * SMOOTHING;
+
+
+
+            const influence = Math.max(
+                0,
+                1 - dist / INFLUENCE_RADIUS
+            );
+
+
+            const length =
+                BASE_LENGTH +
+                influence * MAX_LENGTH;
+
+
+            const alpha =
+                0.18 +
+                influence * 0.7;
+
+
+            ctx.strokeStyle =
+                "rgba(56,189,248," + alpha + ")";
+
+
+            ctx.lineWidth =
+                1 +
+                influence * 1.5;
+
+
+
+            const cos = Math.cos(v.angle);
+            const sin = Math.sin(v.angle);
+
+
+            const half = length / 2;
+
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                v.x - cos*half,
+                v.y - sin*half
+            );
+
+            ctx.lineTo(
+                v.x + cos*half,
+                v.y + sin*half
+            );
+
+            ctx.stroke();
+
+        }
+
+
+        requestAnimationFrame(animate);
+
+    }
+
+
+    animate();
+
+
+})();
+</script>
+
+
+<style>
+
+.vector-field {
+    width:100%;
+    height:100%;
+    display:block;
+    opacity:0.9;
+}
+
+</style>
