@@ -1,0 +1,216 @@
+---
+const {
+  hexSize = 20,
+  radius = 90,
+  color = "#38bdf8",
+  glowColor = "#facc15",
+  opacity = 0.05,
+} = Astro.props;
+---
+
+<canvas
+  data-hex-canvas
+  class="absolute inset-0 w-full h-full pointer-events-none"
+  data-hex-size={hexSize}
+  data-radius={radius}
+  data-color={color}
+  data-glow-color={glowColor}
+  data-opacity={opacity}
+/>
+
+<script>
+  // Note: <script> in .astro files is compiled as an ES module, which means
+  // `document.currentScript` is always null here — it can't be used to find
+  // "this" canvas. Instead we find every hex canvas on the page and boot
+  // each one independently, so this works no matter how many are on a page.
+
+  function initReceiverHex(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const HEX_SIZE = Number(canvas.dataset.hexSize) || 20;
+    const LIGHT_RADIUS = Number(canvas.dataset.radius) || 170;
+    const BASE_ALPHA = Number(canvas.dataset.opacity) || 0.05;
+    const COLOR = canvas.dataset.color || "#38bdf8";
+    const GLOW_COLOR = canvas.dataset.glowColor || "#facc15";
+
+    const toRgb = (hex: string) => {
+      const c = hex.replace("#", "");
+      return {
+        r: parseInt(c.substring(0, 2), 16),
+        g: parseInt(c.substring(2, 4), 16),
+        b: parseInt(c.substring(4, 6), 16),
+      };
+    };
+
+    const rgb = toRgb(COLOR);
+    const glowRgb = toRgb(GLOW_COLOR);
+
+    // Smoothed "lit" amount per hex (0 = dark, 1 = fully lit), indexed the
+    // same as `hexes`. Purely a function of distance to the cursor — no
+    // randomness involved, just a bit of smoothing so it's not a hard flicker.
+    let litAlpha: Float32Array = new Float32Array(0);
+
+    // The box we treat as the animation's bounds — canvas is inset-0 inside it.
+    const bounds = canvas.parentElement as HTMLElement;
+
+    let width = 0;
+    let height = 0;
+    let visible = true;
+
+    const mouse = { x: -9999, y: -9999 };
+
+    let hexes: { x: number; y: number }[] = [];
+    let hexPath: Path2D;
+
+    const io = new IntersectionObserver((entries) => {
+      visible = entries[0].isIntersecting;
+    });
+    io.observe(bounds);
+
+    // Tracking mouse globally (rather than via a listener on the wrapper div)
+    // means it keeps working even when other elements (like the card's text)
+    // sit visually on top of the canvas's own DOM parent.
+    function onPointerMove(e: PointerEvent) {
+      const rect = canvas.getBoundingClientRect();
+      const inside =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+
+      if (inside) {
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      } else {
+        mouse.x = -9999;
+        mouse.y = -9999;
+      }
+    }
+
+    function onPointerGone() {
+      mouse.x = -9999;
+      mouse.y = -9999;
+    }
+
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    document.addEventListener("mouseleave", onPointerGone);
+
+    function resize() {
+      const rect = bounds.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = Math.max(1, Math.round(width * dpr));
+      canvas.height = Math.max(1, Math.round(height * dpr));
+      canvas.style.width = width + "px";
+      canvas.style.height = height + "px";
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      buildGrid();
+    }
+
+    function buildGrid() {
+      hexes = [];
+
+      const horiz = Math.sqrt(3) * HEX_SIZE;
+      const vert = HEX_SIZE * 1.5;
+
+      const cols = Math.ceil(width / horiz) + 2;
+      const rows = Math.ceil(height / vert) + 2;
+
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          hexes.push({
+            x: col * horiz + (row % 2 ? horiz / 2 : 0),
+            y: row * vert,
+          });
+        }
+      }
+
+      hexPath = new Path2D();
+      for (let i = 0; i < 6; i++) {
+        const a = (Math.PI / 3) * i - Math.PI / 6;
+        const x = HEX_SIZE * Math.cos(a);
+        const y = HEX_SIZE * Math.sin(a);
+        if (i === 0) hexPath.moveTo(x, y);
+        else hexPath.lineTo(x, y);
+      }
+      hexPath.closePath();
+
+      litAlpha = new Float32Array(hexes.length);
+    }
+
+    let t = 0;
+
+    function draw() {
+      requestAnimationFrame(draw);
+      if (!visible || width === 0 || height === 0) return;
+
+      t += 0.016;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const rr = LIGHT_RADIUS * LIGHT_RADIUS;
+      const inside = mouse.x > -1000;
+
+      for (let i = 0; i < hexes.length; i++) {
+        const hex = hexes[i];
+
+        const dx = hex.x - mouse.x;
+        const dy = hex.y - mouse.y;
+        const glow = inside && dx * dx + dy * dy <= rr ? 1 : 0;
+        litAlpha[i] = glow;
+
+        // Deterministic: purely distance-to-cursor, no smoothing.
+
+        ctx.save();
+        ctx.translate(hex.x, hex.y);
+
+        // Always-on faint border so the grid structure reads everywhere.
+        ctx.strokeStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${BASE_ALPHA})`;
+        ctx.lineWidth = 1;
+        ctx.stroke(hexPath);
+
+        if (glow > 0.01) {
+          ctx.shadowColor = `rgba(${glowRgb.r},${glowRgb.g},${glowRgb.b},${glow})`;
+          ctx.shadowBlur = 14 * glow;
+
+          ctx.fillStyle = `rgba(${glowRgb.r},${glowRgb.g},${glowRgb.b},${glow * 0.85})`;
+          ctx.fill(hexPath);
+
+          ctx.shadowBlur = 0;
+
+          ctx.strokeStyle = `rgba(${glowRgb.r},${glowRgb.g},${glowRgb.b},${glow})`;
+          ctx.lineWidth = 1.5;
+          ctx.stroke(hexPath);
+        }
+
+        ctx.restore();
+      }
+    }
+
+    const ro = new ResizeObserver(() => resize());
+    ro.observe(bounds);
+
+    resize();
+    draw();
+  }
+
+  function initAll() {
+    document
+      .querySelectorAll<HTMLCanvasElement>("canvas[data-hex-canvas]")
+      .forEach((canvas) => {
+        if (canvas.dataset.hexInitialized) return;
+        canvas.dataset.hexInitialized = "true";
+        initReceiverHex(canvas);
+      });
+  }
+
+  initAll();
+  // Re-init on Astro view-transition navigations, in case this page uses them.
+  document.addEventListener("astro:page-load", initAll);
+</script>

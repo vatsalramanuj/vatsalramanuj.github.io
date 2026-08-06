@@ -1,0 +1,218 @@
+---
+const {
+  radius = 140,
+  ringSpacing = 16,
+  color = "#67e8f9",
+  opacity = 0.9,
+  animated = true,
+} = Astro.props;
+---
+
+<canvas
+  data-bessel-canvas
+  class="absolute inset-0 w-full h-full pointer-events-none"
+  data-radius={radius}
+  data-ring-spacing={ringSpacing}
+  data-color={color}
+  data-opacity={opacity}
+  data-animated={animated ? "1" : "0"}
+/>
+
+<script>
+  // Renders an approximation of a zeroth-order Bessel beam intensity
+  // profile — J0(k·r)^2 — as concentric rings centered on the cursor.
+  // Uses the standard Abramowitz & Stegun rational approximations for J0
+  // (9.4.1 for small x, 9.4.3 for large x), which are cheap enough to
+  // evaluate per-ring, per-frame.
+
+  function besselJ0(x: number): number {
+    const ax = Math.abs(x);
+
+    if (ax <= 3) {
+      const t = ax / 3;
+      const t2 = t * t;
+      return (
+        1 -
+        2.2499997 * t2 +
+        1.2656208 * t2 ** 2 -
+        0.3163866 * t2 ** 3 +
+        0.0444479 * t2 ** 4 -
+        0.0039444 * t2 ** 5 +
+        0.00021 * t2 ** 6
+      );
+    }
+
+    const t = 3 / ax;
+    const f0 =
+      0.79788456 -
+      0.00000077 * t -
+      0.0055274 * t ** 2 -
+      0.00009512 * t ** 3 +
+      0.00137237 * t ** 4 -
+      0.00072805 * t ** 5 +
+      0.00014476 * t ** 6;
+    const theta0 =
+      ax -
+      0.78539816 -
+      0.04166397 * t -
+      0.00003954 * t ** 2 +
+      0.00262573 * t ** 3 -
+      0.00054125 * t ** 4 -
+      0.00029333 * t ** 5 +
+      0.00013558 * t ** 6;
+
+    return (f0 / Math.sqrt(ax)) * Math.cos(theta0);
+  }
+
+  function initBesselRings(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const MAX_RADIUS = Number(canvas.dataset.radius) || 140;
+    const RING_SPACING = Number(canvas.dataset.ringSpacing) || 16;
+    const BASE_OPACITY = Number(canvas.dataset.opacity) || 0.9;
+    const ANIMATED = canvas.dataset.animated === "1";
+    const COLOR = canvas.dataset.color || "#67e8f9";
+
+    const rgb = (() => {
+      const c = COLOR.replace("#", "");
+      return {
+        r: parseInt(c.substring(0, 2), 16),
+        g: parseInt(c.substring(2, 4), 16),
+        b: parseInt(c.substring(4, 6), 16),
+      };
+    })();
+
+    // k controls how tightly packed the rings are.
+    const K = (2 * Math.PI) / RING_SPACING;
+    const STEP = 2; // px between sampled ring radii
+
+    const bounds = canvas.parentElement as HTMLElement;
+
+    let width = 0;
+    let height = 0;
+    let visible = true;
+
+    // Raw cursor position — no lag/lerp, the pattern tracks the mouse exactly.
+    const mouse = { x: -9999, y: -9999 };
+
+    const io = new IntersectionObserver((entries) => {
+      visible = entries[0].isIntersecting;
+    });
+    io.observe(bounds);
+
+    function onPointerMove(e: PointerEvent) {
+      const rect = canvas.getBoundingClientRect();
+      const inside =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+
+      if (inside) {
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      } else {
+        mouse.x = -9999;
+        mouse.y = -9999;
+      }
+    }
+
+    function onPointerGone() {
+      mouse.x = -9999;
+      mouse.y = -9999;
+    }
+
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    document.addEventListener("mouseleave", onPointerGone);
+
+    function resize() {
+      const rect = bounds.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = Math.max(1, Math.round(width * dpr));
+      canvas.height = Math.max(1, Math.round(height * dpr));
+      canvas.style.width = width + "px";
+      canvas.style.height = height + "px";
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    let t = 0;
+
+    function draw() {
+      requestAnimationFrame(draw);
+      if (!visible || width === 0 || height === 0) return;
+
+      t += 0.016;
+
+      ctx.clearRect(0, 0, width, height);
+
+      if (mouse.x < -1000) return;
+
+      // Slow phase drift so the pattern feels alive — purely a function of
+      // time, not of pointer movement, so it never introduces cursor lag.
+      const phase = ANIMATED ? t * 0.6 : 0;
+
+      ctx.globalCompositeOperation = "lighter";
+
+      for (let r = 0; r <= MAX_RADIUS; r += STEP) {
+        const x = K * r + phase;
+        const j0 = besselJ0(x);
+        const intensity = j0 * j0; // 0..1, brightest at center
+
+        // Extra taper near the outer edge so it doesn't cut off abruptly.
+        const edgeFade = Math.max(0, 1 - r / MAX_RADIUS);
+
+        const alpha = intensity * BASE_OPACITY * edgeFade;
+        if (alpha < 0.008) continue;
+
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, r, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha})`;
+        ctx.lineWidth = STEP * 1.4;
+        ctx.stroke();
+      }
+
+      // Bright core at the very center of the beam.
+      const core = ctx.createRadialGradient(
+        mouse.x,
+        mouse.y,
+        0,
+        mouse.x,
+        mouse.y,
+        RING_SPACING * 0.6
+      );
+      core.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},${BASE_OPACITY})`);
+      core.addColorStop(1, `rgba(${rgb.r},${rgb.g},${rgb.b},0)`);
+      ctx.fillStyle = core;
+      ctx.beginPath();
+      ctx.arc(mouse.x, mouse.y, RING_SPACING * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.globalCompositeOperation = "source-over";
+    }
+
+    const ro = new ResizeObserver(() => resize());
+    ro.observe(bounds);
+
+    resize();
+    draw();
+  }
+
+  function initAll() {
+    document
+      .querySelectorAll<HTMLCanvasElement>("canvas[data-bessel-canvas]")
+      .forEach((canvas) => {
+        if (canvas.dataset.besselInitialized) return;
+        canvas.dataset.besselInitialized = "true";
+        initBesselRings(canvas);
+      });
+  }
+
+  initAll();
+  document.addEventListener("astro:page-load", initAll);
+</script>

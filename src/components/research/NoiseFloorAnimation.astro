@@ -1,0 +1,165 @@
+---
+const {
+  radius = 130,
+  color = "#4ade80",
+  opacity = 0.5,
+} = Astro.props;
+---
+
+<canvas
+  data-noise-canvas
+  class="absolute inset-0 w-full h-full pointer-events-none"
+  data-radius={radius}
+  data-color={color}
+  data-opacity={opacity}
+/>
+
+<script>
+  // A clean "signal locked" glow at the cursor with a couple of expanding
+  // ping rings, plus a faint pulsing boundary marking the detection radius.
+
+  function initSignalPing(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const LIGHT_RADIUS = Number(canvas.dataset.radius) || 130;
+    const BASE_OPACITY = Number(canvas.dataset.opacity) || 0.5;
+    const COLOR = canvas.dataset.color || "#4ade80";
+
+    const rgb = (() => {
+      const c = COLOR.replace("#", "");
+      return {
+        r: parseInt(c.substring(0, 2), 16),
+        g: parseInt(c.substring(2, 4), 16),
+        b: parseInt(c.substring(4, 6), 16),
+      };
+    })();
+
+    const bounds = canvas.parentElement as HTMLElement;
+
+    let width = 0;
+    let height = 0;
+    let visible = true;
+
+    // Raw cursor position — tracks exactly, no lag.
+    const mouse = { x: -9999, y: -9999 };
+
+    const io = new IntersectionObserver((entries) => {
+      visible = entries[0].isIntersecting;
+    });
+    io.observe(bounds);
+
+    function onPointerMove(e: PointerEvent) {
+      const rect = canvas.getBoundingClientRect();
+      const inside =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+
+      if (inside) {
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      } else {
+        mouse.x = -9999;
+        mouse.y = -9999;
+      }
+    }
+
+    function onPointerGone() {
+      mouse.x = -9999;
+      mouse.y = -9999;
+    }
+
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    document.addEventListener("mouseleave", onPointerGone);
+
+    function resize() {
+      const rect = bounds.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = Math.max(1, Math.round(width * dpr));
+      canvas.height = Math.max(1, Math.round(height * dpr));
+      canvas.style.width = width + "px";
+      canvas.style.height = height + "px";
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    let t = 0;
+
+    // Number and timing of the expanding "ping" rings.
+    const RING_COUNT = 3;
+    const RING_PERIOD = 1.8; // seconds per ring cycle
+
+    function draw() {
+      requestAnimationFrame(draw);
+      if (!visible || width === 0 || height === 0) return;
+
+      t += 0.016;
+
+      ctx.clearRect(0, 0, width, height);
+
+      if (mouse.x < -1000) return;
+
+      // --- Clean signal glow at the cursor ---
+      const glow = ctx.createRadialGradient(
+        mouse.x,
+        mouse.y,
+        0,
+        mouse.x,
+        mouse.y,
+        LIGHT_RADIUS * 0.55
+      );
+      glow.addColorStop(0, `rgba(${rgb.r},${rgb.g},${rgb.b},${BASE_OPACITY})`);
+      glow.addColorStop(1, `rgba(${rgb.r},${rgb.g},${rgb.b},0)`);
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(mouse.x, mouse.y, LIGHT_RADIUS * 0.55, 0, Math.PI * 2);
+      ctx.fill();
+
+      // --- Expanding "signal locked" ping rings ---
+      for (let i = 0; i < RING_COUNT; i++) {
+        const phase = ((t + (i * RING_PERIOD) / RING_COUNT) % RING_PERIOD) / RING_PERIOD;
+        const r = phase * LIGHT_RADIUS;
+        const alpha = (1 - phase) * BASE_OPACITY;
+
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, r, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // --- Detection-radius boundary ---
+      const boundaryPulse = 0.15 + 0.1 * Math.sin(t * 1.5);
+      ctx.beginPath();
+      ctx.arc(mouse.x, mouse.y, LIGHT_RADIUS, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${boundaryPulse})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    const ro = new ResizeObserver(() => resize());
+    ro.observe(bounds);
+
+    resize();
+    draw();
+  }
+
+  function initAll() {
+    document
+      .querySelectorAll<HTMLCanvasElement>("canvas[data-noise-canvas]")
+      .forEach((canvas) => {
+        if (canvas.dataset.noiseInitialized) return;
+        canvas.dataset.noiseInitialized = "true";
+        initSignalPing(canvas);
+      });
+  }
+
+  initAll();
+  document.addEventListener("astro:page-load", initAll);
+</script>
