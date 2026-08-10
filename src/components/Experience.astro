@@ -2,6 +2,7 @@
 const experiences = [
   {
     company: "OLA Krutrim",
+    companyLink: "https://www.olakrutrim.com/",
     role: "ADAS Software Development Intern",
     period: "May 2025 – Aug 2025",
     location: "Bengaluru, India",
@@ -23,29 +24,31 @@ const experiences = [
     ]
   },
 
-  {
-    company: "Centre of Light for Life, University of Adelaide",
-    role: "Research Intern",
-    period: "May 2024 – Jul 2024",
-    location: "Adelaide, Australia",
-    description:
-      "Worked on optical imaging systems for biological microscopy, combining experimental optics with computational image reconstruction.",
-    achievements: [
-      "Aligned and characterised Bessel and Airy beam optical systems.",
-      "Performed PSF analysis and image deconvolution.",
-      "Worked with diffraction-free light-sheet microscopy.",
-      "Processed volumetric biological image datasets."
-    ],
-    technologies: [
-      "Python",
-      "Optics",
-      "Photonics",
-      "Image Processing"
-    ]
-  },
+  // {
+  //   company: "Centre of Light for Life, University of Adelaide",
+  //   companyLink: "",
+  //   role: "Research Intern",
+  //   period: "May 2024 – Jul 2024",
+  //   location: "Adelaide, Australia",
+  //   description:
+  //     "Worked on optical imaging systems for biological microscopy, combining experimental optics with computational image reconstruction.",
+  //   achievements: [
+  //     "Aligned and characterised Bessel and Airy beam optical systems.",
+  //     "Performed PSF analysis and image deconvolution.",
+  //     "Worked with diffraction-free light-sheet microscopy.",
+  //     "Processed volumetric biological image datasets."
+  //   ],
+  //   technologies: [
+  //     "Python",
+  //     "Optics",
+  //     "Photonics",
+  //     "Image Processing"
+  //   ]
+  // },
 
   {
     company: "Silver Touch Technologies",
+    companyLink: "https://www.silvertouch.com/",
     role: "Machine Learning Intern",
     period: "May 2023 – Jul 2023",
     location: "Ahmedabad, India",
@@ -135,12 +138,27 @@ const experiences = [
 
                     </h3>
 
-                    <p
-                      class="text-sky-400 mt-2">
+                    {job.companyLink ? (
+                      <a
+                        href={job.companyLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-block text-sky-400 mt-2
+                               underline underline-offset-2
+                               decoration-sky-400/40
+                               transition-colors duration-300
+                               hover:text-sky-300 hover:decoration-sky-300">
 
-                      {job.company}
+                        {job.company}
 
-                    </p>
+                      </a>
+                    ) : (
+                      <p class="text-sky-400 mt-2">
+
+                        {job.company}
+
+                      </p>
+                    )}
 
                   </div>
 

@@ -9,20 +9,22 @@ const research = [
     slug: "physics-informed-passive-radar-localization",
     institution: "Indian Institute of Technology Madras",
     duration: "Jan 2025 – May 2025",
+    supervisor: "Prof. K. Giridhar",
+    supervisorLink: "https://scholar.google.com/citations?user=WAZimrsAAAAJ&hl=en",
     description:
-      "Developed a deep learning framework for localising and tracking multiple airborne targets in a multistatic passive radar network by combining physical signal models with modern neural architectures.",
+      "Developed a deep learning framework for localising and tracking multiple airborne targets in a multistatic distributed passive radar network.",
     highlights: [
       "Physics-informed GRU–Transformer architecture",
-      "Fusion of TDOA and FDOA measurements",
+      "Time of Flight and Doppler measurements used as measured inputs",
       "Joint estimation of 3D position and velocity",
-      "Near-constant inference time",
-      "≈14 m localisation RMSE",
+      "Near-constant inference time even for a large number of targets",
+      "14 m localisation RMSE, with 99.2% detections with full CRLB noise added in measurements.",
     ],
     technologies: [
       "Python",
       "PyTorch",
       "Signal Processing",
-      "Radar",
+      "Multistatic Radar",
       "Machine Learning",
     ],
   },
@@ -32,18 +34,16 @@ const research = [
     slug: "light-sheet-fluorescence-microscopy",
     institution: "Centre of Light for Life, University of Adelaide",
     duration: "May 2024 – Jul 2024",
+    supervisor: "Prof. Kishan Dholakia",
+    supervisorLink: "https://scholar.google.com/citations?user=OlD7pJoAAAAJ&hl=en",
     description:
-      "Worked on diffraction-free optical imaging using Bessel and Airy beams for high-resolution biological microscopy, combining optics with computational image reconstruction.",
+      "At CLL, Adelaide; I spent 2 months working on Light Sheet fluorescence microscopy for deep tissue imaging and its reconstruction. I helped develop a twin-Airy beam imaging setup and implemented iterative deconvolution algorithms to recover a 3D image of the tissue.",
     highlights: [
-      "Optical alignment",
-      "Beam shaping",
-      "PSF deconvolution",
-      "3D image reconstruction",
-      "Light-sheet microscopy",
+      "Bessel and Airy Beams for diffraction-free Light Sheet Fluorescence Microscopy for deep tissue imaging",
+      "PSF deconvolution of Twin-Airy beam on real images of biological tissues taken by light sheet fluorescence microscopy methods",
     ],
     technologies: [
       "Optics",
-      "Photonics",
       "Python",
       "Image Processing",
       "Lasers",
@@ -55,19 +55,18 @@ const research = [
     slug: "21-cm-radio-astronomy-receiver",
     institution: "Indian Institute of Technology Madras",
     duration: "2023 – 2024",
+    supervisor: "Prof. C.V. Krishnamurthy",
+    supervisorLink: "https://scholar.google.com/citations?user=eDQ4-JkAAAAJ&hl=en",
     description:
-      "Designed hardware and signal-processing pipelines for observing the neutral hydrogen 21-cm spectral line, gaining experience in RF systems and astronomical instrumentation.",
+      "Worked on the instrumentation as well as the data analysis for detecting the 1420MHz neutral Hydrogen line. ",
     highlights: [
-      "Receiver chain design",
-      "RF filtering",
-      "Antenna systems",
-      "Spectral analysis",
-      "Signal processing",
+      "Built and tuned the receiver chain, which included an LPDA and LNA connected via a coaxial cable to an SDR.",
+      "Achieved Impedance mathcing between antenna and receiver, and captured RF astronmical data from the galactic plane",
     ],
     technologies: [
       "RF Engineering",
-      "Antennas",
-      "MATLAB",
+      "Antenna systems",
+      "Spectral analysis",
       "Python",
       "Astronomy",
     ],
@@ -225,6 +224,26 @@ const research = [
 
               </div>
 
+              {project.supervisor && (
+                <p class="mt-2 text-sm text-zinc-500 italic">
+                  Supervised by{" "}
+                  {project.supervisorLink ? (
+                    <a
+                      href={project.supervisorLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="not-italic text-zinc-400 underline underline-offset-2
+                             decoration-zinc-600
+                             transition-colors duration-300
+                             hover:text-sky-400 hover:decoration-sky-400">
+                      {project.supervisor}
+                    </a>
+                  ) : (
+                    project.supervisor
+                  )}
+                </p>
+              )}
+
               <p class="mt-8 text-zinc-300 leading-8">
                 {project.description}
               </p>
@@ -260,7 +279,7 @@ const research = [
 
               </div>
 
-              <a
+              {/* <a
                 href={`/research/${project.slug}`}
                 class="mt-8 inline-flex items-center gap-2
                        text-sky-400 font-semibold
@@ -283,7 +302,7 @@ const research = [
                   />
                 </svg>
 
-              </a>
+              </a> */}
 
             </div>
 

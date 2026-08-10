@@ -18,8 +18,28 @@ const projects = [
       "CSS",
       "JavaScript"
     ],
-    github: "#",
-    demo: "#"
+    github: "https://github.com/vatsalramanuj/timetable_maker",
+    demo: "https://timetable-maker-o7kb.onrender.com/"
+  },
+
+  {
+    title: "Mastermind",
+    year: "2024",
+    description:
+      "Built a web-based version of the classic Mastermind code-breaking game that generates a new secret pattern every day and persists player progress across browser refreshes.",
+    highlights: [
+      "Daily auto-updating secret pattern",
+      "Progress persistence across refreshes",
+      "Server-rendered Flask templates",
+    ],
+    technologies: [
+      "Python",
+      "Flask",
+      "HTML",
+      "CSS"
+    ],
+    github: "https://github.com/vatsalramanuj/mastermind",
+    demo: "https://mastermind.pythonanywhere.com/"
   },
 
   {
@@ -39,8 +59,8 @@ const projects = [
       "Machine Learning",
       "Tkinter"
     ],
-    github: "#",
-    demo: "#"
+    github: "https://github.com/vatsalramanuj/DigitRecognizer",
+    demo: "https://digitrecognizer-o7lh.onrender.com/"
   },
 
   {
@@ -59,8 +79,7 @@ const projects = [
       "OpenCV",
       "Computer Vision"
     ],
-    github: "#",
-    demo: "#"
+    github: "https://github.com/vatsalramanuj/games"
   }
 ];
 ---
@@ -193,17 +212,19 @@ const projects = [
 
                   </a>
 
-                  <a
-                    href={project.demo}
-                    class="rounded-xl
-                           border border-zinc-700
-                           px-6 py-3
-                           transition
-                           hover:border-zinc-500">
+                  {project.demo && (
+                    <a
+                      href={project.demo}
+                      class="rounded-xl
+                             border border-zinc-700
+                             px-6 py-3
+                             transition
+                             hover:border-zinc-500">
 
-                    Live Demo
+                      Live Demo
 
-                  </a>
+                    </a>
+                  )}
 
                 </div>
 
